@@ -25,6 +25,9 @@ def new_connection(con):
     global connections
     connections += 1
 
+    # Broadcast new connection count.
+    emit('online_count', {'online_count' : connections}, broadcast=True)
+
     # Return all factories in a list ordered by id
     emit('factories', {'factories': [ f._asdict() for f in factory_model.all_factories(con)]})
 
@@ -33,6 +36,9 @@ def new_connection(con):
 def closed_connection():
     global connections
     connections -= 1
+
+    # Broadcast new connection count.
+    emit('online_count', {'online_count' : connections}, broadcast=True)
 
 def reply_error(msg):
     emit('error', msg)

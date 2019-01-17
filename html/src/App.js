@@ -57,15 +57,6 @@ class EditFactoryElem extends PureComponent
     this.setState({max_value: value, changed: true})
   }
 
-  doSave()
-  {
-    // upcall to the saver function we're created with
-    // to inform superior context of new values
-
-    this.saver(this.state);
-
-  }
-
   render() {
     const f = this.state;
 
@@ -85,7 +76,7 @@ class EditFactoryElem extends PureComponent
           <li>Minimum Value: <NumericInput value={f.min_value} min={1} max={1000} onChange={(val) => this.setMinValue(val)}/></li>
           <li>Maximum Value: <NumericInput value={f.max_value} min={1} max={1000} onChange={(val) => this.setMaxValue(val)}/></li>
           <li>
-              <button onClick={() => this.doSave()} disabled={save_disabled}>{this.props.saveLabel}</button>
+              <button onClick={() => this.props.doSave(f)} disabled={save_disabled}>{this.props.saveLabel}</button>
               {deleteElement}
               <button onClick={() => this.props.doCancel()}>Cancel</button>
           </li>
@@ -130,13 +121,10 @@ class FactoryElem extends PureComponent
     const f = this.props.factory;
     const deletor = this.props.deletor;
 
-    // push support into EditFactoryElem if f has a ...
-    // <button onClick={() => deletor(f.id)}>Delete</button>
-    /*
-    Notes
-    // https://reactjs.org/docs/lists-and-keys.html
-    // index key is ok if no resorting happening.
-    */
+    // Notes:
+    //  https://reactjs.org/docs/lists-and-keys.html
+    //  index key is ok if no resorting happening.
+
     const numbersElement = f.numbers.map((n, idx) => <li key={idx}>{n}</li> );
     let editElement;
 
@@ -146,7 +134,7 @@ class FactoryElem extends PureComponent
                         factory={f}
                         doDelete={() => deletor(f.id)}
                         doCancel={() => this.setState({editing: false})}
-                        saver={(f) => this.doEdit(f)}
+                        doSave={(f) => this.doEdit(f)}
                         saveLabel="Update"/>
     } else {
       editElement = <button onClick={() => this.setState({editing: true})}>Edit</button>
@@ -191,21 +179,33 @@ class App extends PureComponent {
     this.state = {
       connected: false,
       creating_factory: false,
-      factories: [] // of Factory
+      online_count: 0,
+      factories: []
     }
 
     this.setupWebSocket();
 
   }
 
+  /*
+    Create websocket connection back to home base
+    and wire up socket message event handlers.
+
+    These events will come in response to our
+    own actions or through actions of others.
+  */
   setupWebSocket() {
     const socket = io.connect();
 
     this.socket = socket;
 
-    socket.on('connect', (resp) => {
-        this.setState({connected: true});
+    socket.on('connect', () => {
+      this.setState({connected: true});
     });
+
+    socket.on('online_count', (data) => {
+      this.setState({online_count: data.online_count})
+    })
 
     socket.on('factories', (data) => {
       // Announcement of initial factory list
@@ -244,6 +244,9 @@ class App extends PureComponent {
     });
   }
 
+  /* UI executed methods: deleteFactory(), saveNewFactory(), saveEditedFactory()
+      message the socket and possible adjust state immediately
+  */
   deleteFactory(f_id)
   {
     this.socket.emit('delete_factory', {id: f_id});
@@ -252,7 +255,6 @@ class App extends PureComponent {
   saveNewFactory(f)
   {
     this.socket.emit('create_factory', f);
-
     this.setState({creating_factory: false});
   }
 
@@ -261,7 +263,9 @@ class App extends PureComponent {
     this.socket.emit('edit_factory', f);
   }
 
-
+  /*
+    Draw the app.
+  */
   render() {
 
     if (! this.state.connected)
@@ -277,7 +281,7 @@ class App extends PureComponent {
       creation_elem = (<EditFactoryElem
                         factory={blank_factory}
                         doCancel={() => this.setState({creating_factory: false})}
-                        saver={(f) => this.saveNewFactory(f)}
+                        doSave={(f) => this.saveNewFactory(f)}
                         saveLabel="Create"
                       />);
     } else {
@@ -287,7 +291,7 @@ class App extends PureComponent {
     }
     return (
       <div className="App">
-        <h1>Factory Channel!</h1>
+        <h1>Factory Channel: {this.state.online_count} Online</h1>
         <h3>{creation_elem}</h3>
         <FactoriesElem factories={this.state.factories}
             deletor={(id) => this.deleteFactory(id)}
