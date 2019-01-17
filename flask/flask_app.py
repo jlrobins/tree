@@ -1,5 +1,6 @@
 from flask import Flask, g, jsonify, request
 from flask_socketio import SocketIO, send, emit
+from os import environ as env
 
 import jlr.db as db
 import factory_model
@@ -12,10 +13,9 @@ app.config.from_object(__name__)
 
 socketio = SocketIO(app)
 
+db_config = 'dbname=%s user=%s host=%s' % (env['DBNAME'], env['DBUSER'], env['DBHOST'])
 
-connection_manager = db.configure_flask_socketio("dbname=tree_db",
-        register_types=False)
-
+connection_manager = db.configure_flask_socketio(db_config, register_types=False)
 
 connections = 0
 
@@ -116,32 +116,5 @@ def edit_factory(con, data):
     emit('factory_updated', {'factory': updated_factory}, broadcast=True)
 
 
-
-
-
 if __name__ == '__main__':
     socketio.run(app)
-
-
-"""
-@app.route('/api/1/login', methods=['POST'])
-def do_login():
-        as_json = request.get_json(force=True)
-
-        username, password = as_json.get('username'), as_json.get('password')
-        assert username
-        assert password
-
-        session_key = users.perform_login(g.con, username, password)
-
-        if session_key:
-                # Happiness.
-                session['session_key'] = session_key
-                results = {'authenticated': as_json['username']}
-        else:
-                session['session_key'] = None
-                results = {'authenticated': False}
-
-        return jsonify(results)
-"""
-

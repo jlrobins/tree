@@ -1,0 +1,39 @@
+#!/bin/sh
+
+set -e
+
+BASE=$HOME/py/tree
+REMOTE_BASE=/home/ubuntu/deploy
+
+deploy_react_and_static()
+{
+	cd $BASE/html
+	npm run build
+
+	cd build
+	ssh ec2 "mkdir /tmp/html_$$; if [ -d /tmp/html_old ]; then sudo rm -rf /tmp/html_old; fi"
+	scp -r * ec2:/tmp/html_$$/
+	ssh ec2 "sudo mv /var/www/html /tmp/html_old; sudo mv /tmp/html_$$ /var/www/html; sudo chmod 755 /var/www/html; sudo chown root.root /var/www/html;"
+}
+
+deploy_flask() {
+	cd $BASE
+	scp -r etc flask ec2:$REMOTE_BASE
+	scp -r deploy_bin/* ec2:$REMOTE_BASE/bin
+	ssh ec2 "$REMOTE_BASE/bin/refresh_virtualenv"
+}
+
+restart_flask() {
+	ssh ec2 "$REMOTE_BASE/bin/restart_flask.sh"
+}
+
+restart_haproxy() {
+	cd $BASE
+	#scp -r etc flask ec2:$REMOTE_BASE
+	ssh ec2 "sudo service haproxy restart"
+}
+
+deploy_react_and_static
+deploy_flask
+restart_flask
+restart_haproxy
