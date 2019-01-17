@@ -1,7 +1,13 @@
 import React, { Component, PureComponent } from 'react';
+
+import NumericInput from 'react-numeric-input';
+
+
 import './App.css';
 
 import io from 'socket.io-client';
+
+
 
 
 
@@ -15,11 +21,27 @@ class EditFactoryElem extends PureComponent
 
     // Shallow clone the factory for modification purposes.
     this.state = {...props.factory}
+    this.state.happy = true;
+  }
+
+  componentDidUpdate(prevProps, prevState)
+  {
+
+    const curState = this.state;
+    const newHappy = (
+      curState.name.length > 0 && curState.name.length < 256
+      && curState.min_value > 0 && curState.min_value < curState.max_value
+      && curState.max_value <= 1000
+    )
+
+    if(prevState.happy !== newHappy)
+      this.setState({happy: newHappy});
+
   }
 
   setName(value)
   {
-    this.setState({name: value})
+    this.setState({name: value});
   }
 
   setMinValue(value)
@@ -42,7 +64,6 @@ class EditFactoryElem extends PureComponent
 
   }
 
-
   render() {
     const f = this.state;
 
@@ -52,14 +73,21 @@ class EditFactoryElem extends PureComponent
     {
       deleteElement = <button onClick={() => this.props.doDelete()}>Delete</button>
     }
+
+    const save_disabled = !f.happy;
+
+    if(this.state.happy)
+    {
+
+    }
     return (
       <div className="EditFactory">
         <ul>
           <li>Name: <input type="text" value={f.name} onChange={(ev) => this.setName(ev.target.value)}/></li>
-          <li>Minimum Value: <input type="text" value={f.min_value} onChange={(ev) => this.setMinValue(ev.target.value)}/></li>
-          <li>Maximum Value: <input type="text" value={f.max_value} onChange={(ev) => this.setMaxValue(ev.target.value)}/></li>
+          <li>Minimum Value: <NumericInput value={f.min_value} min={1} max={1000} onChange={(val) => this.setMinValue(val)}/></li>
+          <li>Maximum Value: <NumericInput value={f.max_value} min={1} max={1000} onChange={(val) => this.setMaxValue(val)}/></li>
           <li>
-              <button onClick={() => this.doSave()}>{this.props.saveLabel}</button>
+              <button onClick={() => this.doSave()} disabled={save_disabled}>{this.props.saveLabel}</button>
               {deleteElement}
               <button onClick={() => this.props.doCancel()}>Cancel</button>
           </li>
@@ -225,7 +253,6 @@ class App extends PureComponent {
 
 
   render() {
-
 
     if (! this.state.connected)
     {
