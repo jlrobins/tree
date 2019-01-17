@@ -21,18 +21,20 @@ class EditFactoryElem extends PureComponent
 
     // Shallow clone the factory for modification purposes.
     this.state = {...props.factory}
-    this.state.happy = true;
+    this.state.happy = EditFactoryElem.isHappy(this.state);;
+  }
+
+  static isHappy(state)
+  {
+    return (state.name.length > 0 && state.name.length < 256
+      && state.min_value > 0 && state.min_value < state.max_value
+      && state.max_value <= 1000)
   }
 
   componentDidUpdate(prevProps, prevState)
   {
 
-    const curState = this.state;
-    const newHappy = (
-      curState.name.length > 0 && curState.name.length < 256
-      && curState.min_value > 0 && curState.min_value < curState.max_value
-      && curState.max_value <= 1000
-    )
+    const newHappy = EditFactoryElem.isHappy(this.state);
 
     if(prevState.happy !== newHappy)
       this.setState({happy: newHappy});
