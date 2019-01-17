@@ -42,7 +42,7 @@ def reply_error(msg):
 
 def complain_about_factory_params(name, min_num, max_num):
     if type(name) != str or type(min_num) != int or type(max_num) != int:
-        reply_error('Bad Parameter Types: %s %s %s' % (type(name), type(min_num), type(max_num)))
+        reply_error('Bad Parameter Types: %s(%s) %s(%s) %s(%s)' % (name, type(name), min_num, type(min_num), max_num, type(max_num)))
         return True # did indeed complain
 
     if len(name) >= 256:
@@ -102,7 +102,7 @@ def edit_factory(con, data):
     # regenerates children if change to min/max
     # broadcasts it
     f_id, new_name, new_low, new_high = (data.get('id'), data.get('name'),
-                                            data.get('low_value'), data.get('high_value'))
+                                            data.get('min_value'), data.get('max_value'))
 
     if type(f_id) is not int:
         reply_error('Expected an int')
@@ -112,7 +112,7 @@ def edit_factory(con, data):
 
     updated_factory = factory_model.update_factory(con, f_id, new_name, new_low, new_high)
     print('Edited %s' % updated_factory)
-    emit('updated_factory', {'factory': new_factory}, broadcast=True)
+    emit('factory_updated', {'factory': updated_factory}, broadcast=True)
 
 
 

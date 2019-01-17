@@ -62,6 +62,7 @@ class EditFactoryElem extends PureComponent
     // upcall to the saver function we're created with
     // to inform superior context of new values
 
+    console.log('EditFactoryElem doSave(): ', this.state);
     this.saver(this.state);
 
   }
@@ -113,6 +114,19 @@ class FactoryElem extends PureComponent
       editing: false
     }
   }
+
+  doEdit(f)
+  {
+
+    console.log('FactoryElem.doEdit():', f);
+
+    // upcall to main app to do the saving.
+    this.props.editor(f);
+
+    // no longer editing.
+    this.setState({editing: false});
+  }
+
   render()
   {
 
@@ -135,7 +149,7 @@ class FactoryElem extends PureComponent
                         factory={f}
                         doDelete={() => deletor(f.id)}
                         doCancel={() => this.setState({editing: false})}
-                        saver={(f) => console.log('implement edit save!')}
+                        saver={(f) => this.doEdit(f)}
                         saveLabel="Update"/>
     } else {
       editElement = <button onClick={() => this.setState({editing: true})}>Edit</button>
@@ -158,7 +172,7 @@ const FactoriesElem = (props) => {
   if(props.factories.length)
   {
     const f_list = props.factories.map(f =>
-      <li key={f.id}><FactoryElem factory={f} deletor={props.deletor}/></li>
+      <li key={f.id}><FactoryElem factory={f} deletor={props.deletor} editor={props.editor} /></li>
     );
 
     return (
@@ -240,11 +254,15 @@ class App extends PureComponent {
 
   saveNewFactory(f)
   {
-
-
     this.socket.emit('create_factory', f);
 
     this.setState({creating_factory: false});
+  }
+
+  saveEditedFactory(f)
+  {
+    console.log('App.saveEditedFactory()', f)
+    this.socket.emit('edit_factory', f);
   }
 
 
@@ -275,7 +293,9 @@ class App extends PureComponent {
       <div className="App">
         <h1>Factory Channel!</h1>
         <h3>{creation_elem}</h3>
-        <FactoriesElem factories={this.state.factories} deletor={(id) => this.deleteFactory(id)}/>
+        <FactoriesElem factories={this.state.factories}
+            deletor={(id) => this.deleteFactory(id)}
+            editor={(f) => this.saveEditedFactory(f)}/>
       </div>
     );
   }

@@ -129,11 +129,36 @@ def insert_builder(con, tableName, rowDict, excludeKeys=None,
 		e.query = cursor.query
 		raise
 
+def update_builder(con, table_name:str, where_columns_and_values:list, update_columns_and_values:list):
+
+	# Should be of form [ ('foo=%s', 12), ('bar < %s', 55) ] to build up where clause
+	assert(all(len(p) == 2 and type(p[0]) is str and '%s' in p[0] for p in where_columns_and_values))
+
+	# Should be of form [('blat', 45), ('sdf', 99)] for columns to update + value to update to
+	assert(all(len(p) == 2 and type(p[0]) is str and '%s' not in p[0] for p in update_columns_and_values))
+
+	# "foo=%s, bar=%s" ...
+	update_column_part = ', '.join('%s = %%s' % colname for colname, _ in update_columns_and_values)
+	# (12, 'barvalue') ...
+	values = [v for _, v in update_columns_and_values]
+
+	where_column_part = ', '.join(colexpr for colexpr, _ in where_columns_and_values)
+	values.extend(v for _, v in where_columns_and_values)
+
+	# Psycopy desires a tuple wrapping values
+	values_tuple = tuple(values)
+
+	statement = 'update %s set %s where %s' % (table_name, update_column_part, where_column_part)
+	print(statement, values_tuple)
+
+	return execute(con, statement, values)
+
+
 def get_pct_s_string(values):
 	pcts = ['%s'] * len(values)
 	return ', '.join(pcts)
 
-def bulk_insert_builder2(con, tableName, rowDictList, colList=None, excludeKeys=None, addToEveryRow=None, return_column=None):
+def bulk_insert_builder(con, tableName, rowDictList, colList=None, excludeKeys=None, addToEveryRow=None, return_column=None):
 	"""
 		Bulk-insert the rows in rowDictList using "insert into ... values (), (), ... ()" .
 		Please please please use this instead of embedding insert_builder inside of loops
