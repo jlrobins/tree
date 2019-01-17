@@ -21,6 +21,7 @@ class EditFactoryElem extends PureComponent
 
     // Shallow clone the factory for modification purposes.
     this.state = {...props.factory}
+    this.state.changed = false;
     this.state.happy = EditFactoryElem.isHappy(this.state);;
   }
 
@@ -43,17 +44,17 @@ class EditFactoryElem extends PureComponent
 
   setName(value)
   {
-    this.setState({name: value});
+    this.setState({name: value, changed: true});
   }
 
   setMinValue(value)
   {
-    this.setState({min_value: value})
+    this.setState({min_value: value, changed: true})
   }
 
   setMaxValue(value)
   {
-    this.setState({max_value: value})
+    this.setState({max_value: value, changed: true})
   }
 
   doSave()
@@ -75,12 +76,8 @@ class EditFactoryElem extends PureComponent
       deleteElement = <button onClick={() => this.props.doDelete()}>Delete</button>
     }
 
-    const save_disabled = !f.happy;
+    const save_disabled = !f.happy || !f.changed;
 
-    if(this.state.happy)
-    {
-
-    }
     return (
       <div className="EditFactory">
         <ul>
