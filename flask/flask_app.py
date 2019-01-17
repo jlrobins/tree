@@ -1,6 +1,7 @@
 from flask import Flask, g, jsonify, request
 from flask_socketio import SocketIO, send, emit
 from os import environ as env
+from functools import wraps
 
 import jlr.db as db
 import factory_model
@@ -18,6 +19,19 @@ db_config = 'dbname=%s user=%s host=%s' % (env['DBNAME'], env['DBUSER'], env['DB
 connection_manager = db.configure_flask_socketio(db_config, register_types=False)
 
 connections = 0
+
+
+def exceptions_to_error_emit(func):
+    @wraps(func)
+    def doit(*args):
+        try:
+            func(*args)
+        except Exception as e:
+            print(e)
+            emit('serverside-error', {'message': 'Sorry! A server-side error happened!'})
+
+    return doit
+
 
 @socketio.on('connect') # namespace='/chat'
 @connection_manager.with_transaction
@@ -41,8 +55,8 @@ def closed_connection():
     emit('online_count', {'online_count' : connections}, broadcast=True)
 
 def reply_error(msg):
-    emit('error', msg)
-    print('error: ' + msg)
+    emit('serverside-error', {'message': msg})
+    print('reply_error: ' + msg)
 
 
 def complain_about_factory_params(name, min_num, max_num):
@@ -67,6 +81,7 @@ def complain_about_factory_params(name, min_num, max_num):
 
 
 @socketio.on('create_factory')
+@exceptions_to_error_emit
 @connection_manager.with_transaction
 def create_factory(con, data):
 
@@ -85,6 +100,7 @@ def create_factory(con, data):
 
 
 @socketio.on('delete_factory')
+@exceptions_to_error_emit
 @connection_manager.with_transaction
 def delete_factory(con, data):
     # deletes it
@@ -98,6 +114,7 @@ def delete_factory(con, data):
     emit('factory_deleted', {'id': f_id}, broadcast=True)
 
 @socketio.on('edit_factory')
+@exceptions_to_error_emit
 @connection_manager.with_transaction
 def edit_factory(con, data):
     # edits it

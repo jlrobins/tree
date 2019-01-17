@@ -180,6 +180,8 @@ class App extends PureComponent {
       connected: false,
       creating_factory: false,
       online_count: 0,
+      connection_error: null,
+      serverside_error: null,
       factories: []
     }
 
@@ -195,12 +197,48 @@ class App extends PureComponent {
     own actions or through actions of others.
   */
   setupWebSocket() {
-    const socket = io.connect();
+    const socket = io.connect({transports: ['websocket']});
 
     this.socket = socket;
 
+
+    /*
+      Websocket lifecycle handlers first
+    */
+    socket.on('reconnect_attempt', () => {
+      socket.io.opts.transports = ['polling', 'websocket'];
+      this.setState({connected: false})
+    });
+
+    socket.on('connect_error', (er) => {
+      this.setState({connected: false, connection_error: er})
+    });
+
+    socket.on('error', (er) => {
+      this.setState({connection_error: er})
+    });
+
+    socket.on('ping', () => {
+      console.log('pinging ... ');
+    });
+
+    socket.on('pong', (latency) => {
+      console.log('pong latency: ' + latency);
+    });
+
     socket.on('connect', () => {
       this.setState({connected: true});
+    });
+
+      socket.on('disconnect', () => {
+        this.setState({connected: false});
+    });
+
+    /*
+      Business-use messages here down
+    */
+    socket.on('serverside-error', (er) => {
+      this.setState({serverside_error: er.message})
     });
 
     socket.on('online_count', (data) => {
@@ -238,10 +276,6 @@ class App extends PureComponent {
       }
       this.setState({factories: factories});
     })
-
-    socket.on('disconnect', () => {
-        this.setState({connected: false});
-    });
   }
 
   /* UI executed methods: deleteFactory(), saveNewFactory(), saveEditedFactory()
@@ -268,9 +302,13 @@ class App extends PureComponent {
   */
   render() {
 
+    let con_error_msg = null;
+    if (this.state.connection_error)
+      con_error_msg = '' + this.state.connection_error;
+
     if (! this.state.connected)
     {
-      return <h1>Connecting ...</h1>
+      return <h1>Connecting {con_error_msg}...</h1>
     }
 
 
@@ -289,9 +327,17 @@ class App extends PureComponent {
       creation_elem =
         <button onClick={() => this.setState({creating_factory: true})}>Create Factory</button>;
     }
+
+    let serverside_error_elem = null;
+    if(this.state.serverside_error)
+    {
+      serverside_error_elem = <h2>{this.state.serverside_error}</h2>;
+    }
+
     return (
       <div className="App">
         <h1>Factory Channel: {this.state.online_count} Online</h1>
+        {serverside_error_elem}
         <h3>{creation_elem}</h3>
         <FactoriesElem factories={this.state.factories}
             deletor={(id) => this.deleteFactory(id)}

@@ -4,7 +4,7 @@ begin;
 	(
 		id serial primary key,
 
-		name text not null unique
+		name text not null
 			-- No want whitespace padded or non-empty names
 			check(trim(name) = name and length(name) > 0),
 
