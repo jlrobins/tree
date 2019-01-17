@@ -149,7 +149,6 @@ def update_builder(con, table_name:str, where_columns_and_values:list, update_co
 	values_tuple = tuple(values)
 
 	statement = 'update %s set %s where %s' % (table_name, update_column_part, where_column_part)
-	print(statement, values_tuple)
 
 	return execute(con, statement, values)
 
