@@ -1,0 +1,26 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Node / create-react-app stuff in html/ subdir
+
+# dependencies
+html/node_modules
+html/.pnp
+html/.pnp.js
+
+# testing
+html/coverage
+
+# production
+html/build
+
+# misc
+.DS_Store
+__pycache__
+html/.env.local
+html/.env.development.local
+html/.env.test.local
+html/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

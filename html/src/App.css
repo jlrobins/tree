@@ -1,0 +1,44 @@
+.App {
+
+}
+
+
+.factory-list, .factory-list ul {
+  list-style: none;
+  margin: 0 0 0 2em;
+  padding: 0;
+}
+
+.factory-list ul {
+  margin-left: 10px;
+}
+
+ul.factory-list li:before {
+  position:relative;
+  top:-0.3em;
+  height:1em;
+  width:12px;
+  color:white;
+  border-bottom:1px solid rgb(100,100,100);
+  content:"";
+  display:inline-block;
+  left:-7px;
+}
+
+ul.factory-list li:last-child:before {
+  border-left:1px solid rgb(100,100,100);
+}
+
+ul.factory-list li {
+  margin: 0;
+  padding: 0 7px;
+  line-height: 20px;
+  color: #369;
+  font-weight: bold;
+  border-left:1px solid rgb(100,100,100);
+}
+
+ul.factory-list li:last-child {
+  border-left:none;
+}
+

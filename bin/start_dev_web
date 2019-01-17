@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e
+
+teardown()
+{
+	kill $flask_pid
+	kill $haproxy_pid
+}
+
+trap "teardown; exit 0" INT
+
+BASE=$HOME/py/tree
+
+source $BASE/venv/bin/activate
+
+haproxy -f $BASE/etc/dev_haproxy.conf &
+haproxy_pid=$!
+
+# Should not be needed if pythonpath was right!
+cd $BASE/flask
+
+export FLASK_APP=flask_app
+export FLASK_DEBUG=1
+
+flask run --host=0.0.0.0 &
+flask_pid=$!
+
+echo $flask_pid
+
+cd $BASE/html
+npm start
+
+
