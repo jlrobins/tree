@@ -61,7 +61,6 @@ class EditFactoryElem extends PureComponent
     // upcall to the saver function we're created with
     // to inform superior context of new values
 
-    console.log('Calling saver with ', this.state);
     this.saver(this.state);
 
   }
@@ -158,8 +157,6 @@ class FactoryElem extends PureComponent
 }
 
 const FactoriesElem = (props) => {
-
-  console.log(props.factories, typeof(props.factories));
 
   if(props.factories.length)
   {
