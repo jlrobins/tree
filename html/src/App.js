@@ -62,7 +62,6 @@ class EditFactoryElem extends PureComponent
     // upcall to the saver function we're created with
     // to inform superior context of new values
 
-    console.log('EditFactoryElem doSave(): ', this.state);
     this.saver(this.state);
 
   }
@@ -117,8 +116,6 @@ class FactoryElem extends PureComponent
 
   doEdit(f)
   {
-
-    console.log('FactoryElem.doEdit():', f);
 
     // upcall to main app to do the saving.
     this.props.editor(f);
@@ -261,7 +258,6 @@ class App extends PureComponent {
 
   saveEditedFactory(f)
   {
-    console.log('App.saveEditedFactory()', f)
     this.socket.emit('edit_factory', f);
   }
 

@@ -33,7 +33,6 @@ def new_connection(con):
 def closed_connection():
     global connections
     connections -= 1
-    print('Lost connection, down to %s' % connections)
 
 def reply_error(msg):
     emit('error', msg)
@@ -70,15 +69,12 @@ def create_factory(con, data):
     # stores it
     # broadcasts it
 
-    print('create_factory: %s' % (data,))
-
     name, min_num, max_num = data.get('name'), data.get('min_value'), data.get('max_value')
 
     if complain_about_factory_params(name, min_num, max_num):
         return
 
     new_factory = factory_model.create_factory(con, name, min_num, max_num)
-    print('Created %s' % new_factory)
     emit('new_factory', {'factory': new_factory}, broadcast=True)
 
 
@@ -111,7 +107,6 @@ def edit_factory(con, data):
         return
 
     updated_factory = factory_model.update_factory(con, f_id, new_name, new_low, new_high)
-    print('Edited %s' % updated_factory)
     emit('factory_updated', {'factory': updated_factory}, broadcast=True)
 
 

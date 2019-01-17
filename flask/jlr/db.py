@@ -33,7 +33,6 @@ class ManagedConnection():
 
 
 	def begin_transaction(self):
-		print('begin_transaction: %s' % self.busy)
 		if not self.con:
 			self.con = self.__connection()
 
@@ -59,6 +58,7 @@ class ManagedConnection():
 				self.commit_after_complete = True # clear it for next request.
 
 		self.busy = False
+
 
 
 	def with_transaction(self, func,):
@@ -137,7 +137,6 @@ def register_composite_types():
 			psycopg2.extensions.register_type(
 				psycopg2.extensions.new_array_type(
 					(c.typarray,), c.type_to_register + '[]', base_type_adaptor))
-			print((c.typarray,), c.type_to_register + '[]', base_type_adaptor)
 
 	cur.close()
 
@@ -158,7 +157,6 @@ def configure_flask(flask_app, params, idle_timeout_secs=30):
 	flask_app.before_request(begin_and_assign_tx)
 
 	def finish_transaction(response):
-		print('Within finish_transaction: %s' % mc.commit_after_complete)
 		g.pop('con', None)
 		mc.complete_transaction()
 
@@ -168,7 +166,6 @@ def configure_flask(flask_app, params, idle_timeout_secs=30):
 
 	@flask_app.errorhandler(500)
 	def error_500(error):
-		print('Errorhandler called!')
 		mc.set_rollback_only()
 		raise error
 
