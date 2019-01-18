@@ -1,7 +1,20 @@
 .App {
-
+  padding-top: 10px ;
+  padding-left: 10px ;
 }
 
+h1 {
+  padding: 20 10 5 10;
+  border: 0;
+  outline: 0;
+  font-weight: bold;
+  background: #2289EA;
+  color: white;
+  font-style: inherit;
+  font-size: 150%;
+  font-family: inherit;
+  vertical-align: baseline;
+}
 
 .factory-list, .factory-list ul {
   list-style: none;
