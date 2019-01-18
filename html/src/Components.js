@@ -2,6 +2,9 @@ import React, { PureComponent } from 'react';
 
 import NumericInput from 'react-numeric-input';
 
+import { Range } from 'rc-slider';
+import 'rc-slider/assets/index.css';
+
 class EditFactoryElem extends PureComponent
 {
   constructor(props)
@@ -10,7 +13,7 @@ class EditFactoryElem extends PureComponent
 
     this.saver = props.saver;
 
-    // Shallow clone the factory for modificatio purposes.
+    // Shallow clone the factory for modification purposes (PureComponent).
     this.state = {...props.factory}
     this.state.changed = false;
     this.state.happy = EditFactoryElem.isHappy(this.state);
@@ -21,13 +24,16 @@ class EditFactoryElem extends PureComponent
 
   static isHappy(state)
   {
+    // Only allow saves if name, min, max values are sane.
     return (state.name.length > 0 && state.name.length < 256
+      && state.number_count > 0 && state.number_count <= 15
       && state.min_value > 0 && state.min_value < state.max_value
       && state.max_value <= 1000)
   }
 
   componentDidUpdate(prevProps, prevState)
   {
+    // Auto-deduce our save button happiness
     const newHappy = EditFactoryElem.isHappy(this.state);
 
     if(prevState.happy !== newHappy)
@@ -54,6 +60,11 @@ class EditFactoryElem extends PureComponent
     this.setState({max_value: value, changed: true})
   }
 
+  setNumberCount(value)
+  {
+    this.setState({number_count: value, changed: true})
+  }
+
   render() {
     const f = this.state;
 
@@ -72,8 +83,12 @@ class EditFactoryElem extends PureComponent
           <li>Name: <input type="text" value={f.name}
                   onChange={(ev) => this.setName(ev.target.value)}
                   ref={this._name_input}/></li>
+
+          <li>Number Count: <NumericInput value={f.number_count} min={1} max={15} onChange={(val) => this.setNumberCount(val)}/></li>
+
           <li>Minimum Value: <NumericInput value={f.min_value} min={1} max={1000} onChange={(val) => this.setMinValue(val)}/></li>
           <li>Maximum Value: <NumericInput value={f.max_value} min={1} max={1000} onChange={(val) => this.setMaxValue(val)}/></li>
+
           <li>
               <button onClick={() => this.props.doSave(f)} disabled={save_disabled}>{this.props.saveLabel}</button>
               {deleteElement}

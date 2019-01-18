@@ -1,9 +1,10 @@
 {
-  "homepage" : "http://jurisolve.com/",
+  "homepage": "http://jurisolve.com/",
   "name": "html",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "rc-slider": "^8.6.4",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-numeric-input": "^2.2.3",

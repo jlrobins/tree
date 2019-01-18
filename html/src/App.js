@@ -150,7 +150,7 @@ class App extends PureComponent {
     let creation_elem;
     if(this.state.creating_factory)
     {
-      const blank_factory = {name: '', min_value: 1, max_value: 1000};
+      const blank_factory = {name: '', min_value: 1, max_value: 1000, number_count: 15};
       creation_elem = (<EditFactoryElem
                         factory={blank_factory}
                         doCancel={() => this.setState({creating_factory: false})}
@@ -167,7 +167,7 @@ class App extends PureComponent {
     if(this.state.serverside_error)
     {
       serverside_error_elem = (
-        <h2 class="Error">
+        <h2 className="Error">
           {this.state.serverside_error}
           <button onClick={() => this.setState({serverside_error: null})}>(clear)</button>
         </h2>);

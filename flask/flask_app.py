@@ -59,22 +59,30 @@ def reply_error(msg):
     print('reply_error: ' + msg)
 
 
-def complain_about_factory_params(name, min_num, max_num):
-    if type(name) != str or type(min_num) != int or type(max_num) != int:
-        reply_error('Bad Parameter Types: %s(%s) %s(%s) %s(%s)' % (name, type(name), min_num, type(min_num), max_num, type(max_num)))
+def complain_about_factory_params(name, min_num, max_num, number_count):
+    if type(name) != str or type(min_num) != int or type(max_num) != int or type(number_count) != int:
+        reply_error('Bad Parameter Types: %s(%s) %s(%s) %s(%s) %s(%s)' % \
+                (name, type(name), min_num, type(min_num), max_num, type(max_num), type(number_count)))
         return True # did indeed complain
 
+    if len(name) == 0:
+        reply_error('Name empty!')
+        return True
+
     if len(name) >= 256:
-        reply_error('Name too long')
+        reply_error('Name too long (max 256 characters)')
         return True
 
     if min_num < 0 or min_num > 1000:
-        reply_error('Lower bound out of bounds')
+        reply_error('Lower bound out of bounds (0..1000)')
         return True
 
     if max_num < 0 or max_num > 1000 or max_num <= min_num:
-        reply_error('Upper bound out of bounds')
+        reply_error('Upper bound out of bounds (0..1000)')
         return True
+
+    if number_count < 1 or number_count > 15:
+        reply_error('Number count out of bounds (1..15)')
 
     # no complaint ...
     return False
@@ -90,12 +98,13 @@ def create_factory(con, data):
     # stores it
     # broadcasts it
 
-    name, min_num, max_num = data.get('name'), data.get('min_value'), data.get('max_value')
+    name, min_num, max_num, number_count = (data.get('name'), data.get('min_value'),
+                                                data.get('max_value'), data.get('number_count'))
 
-    if complain_about_factory_params(name, min_num, max_num):
+    if complain_about_factory_params(name, min_num, max_num, number_count):
         return
 
-    new_factory = factory_model.create_factory(con, name, min_num, max_num)
+    new_factory = factory_model.create_factory(con, name, min_num, max_num, number_count)
     emit('new_factory', {'factory': new_factory}, broadcast=True)
 
 
@@ -120,18 +129,18 @@ def edit_factory(con, data):
     # edits it
     # regenerates children if change to min/max
     # broadcasts it
-    f_id, new_name, new_low, new_high = (data.get('id'), data.get('name'),
-                                            data.get('min_value'), data.get('max_value'))
+    f_id, new_name, new_low, new_high, number_count = (data.get('id'), data.get('name'),
+                                            data.get('min_value'), data.get('max_value'),
+                                            data.get('number_count'))
 
     if type(f_id) is not int:
         reply_error('Expected an int')
 
-    if complain_about_factory_params(new_name, new_low, new_high):
+    if complain_about_factory_params(new_name, new_low, new_high, number_count):
         return
 
-    updated_factory = factory_model.update_factory(con, f_id, new_name, new_low, new_high)
+    updated_factory = factory_model.update_factory(con, f_id, new_name, new_low, new_high, number_count)
     emit('factory_updated', {'factory': updated_factory}, broadcast=True)
-
 
 if __name__ == '__main__':
     socketio.run(app)
