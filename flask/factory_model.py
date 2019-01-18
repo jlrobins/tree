@@ -27,16 +27,16 @@ def create_factory(con, name: str, min_value: int,
     ###
     numbers = generate_numbers(min_value, max_value, number_count)
 
-    rowDict = {'name': name, 'min_value': min_value,
+    row_dict = {'name': name, 'min_value': min_value,
                'max_value': max_value, 'numbers': numbers}
 
-    factory_id = sql.insert(con, 'factory', rowDict, return_columns=('id',))[0]
+    factory_id = sql.insert(con, 'factory', row_dict, return_columns=('id',))[0]
 
-    rowDict['id'] = factory_id
+    row_dict['id'] = factory_id
     # We infer but project. See also all_factories() ...
-    rowDict['number_count'] = len(numbers)
+    row_dict['number_count'] = len(numbers)
 
-    return rowDict
+    return row_dict
 
 
 def update_factory(con, factory_id: int, new_name: str,
@@ -110,8 +110,7 @@ def update_factory(con, factory_id: int, new_name: str,
         raise Exception('Update did not find row to update.'
                         ' Deleted out from underneath?')
 
-    return
-    return_values
+    return return_values
 
 
 def delete_factory(con, f_id: int):

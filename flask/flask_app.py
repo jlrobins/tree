@@ -1,7 +1,8 @@
-from flask import Flask, g, jsonify, request
-from flask_socketio import SocketIO, emit
 from os import environ as env
 from functools import wraps
+from flask import Flask
+from flask_socketio import SocketIO, emit
+
 
 from jlr.db import configure_flask_socketio
 import factory_model
@@ -120,11 +121,11 @@ def complain_about_factory_params(name, min_num, max_num, number_count):
 
         reply_error('Bad Parameter Types: %s(%s) %s(%s) %s(%s) %s(%s)' %
                     (name, type(name), min_num, type(min_num), max_num,
-                     type(max_num), type(number_count)))
+                     type(max_num), number_count, type(number_count)))
 
         return True  # did indeed complain
 
-    if len(name) == 0:
+    if not name:
         reply_error('Name empty!')
         return True
 
