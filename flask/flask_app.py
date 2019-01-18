@@ -17,6 +17,7 @@ db_config = 'dbname=%s user=%s host=%s' % (
 
 connection_manager = configure_flask_socketio(db_config, register_types=False)
 
+
 # decorator to catch exceptions and report back to client.
 def exceptions_to_error_emit(func):
     @wraps(func)
@@ -25,8 +26,8 @@ def exceptions_to_error_emit(func):
             func(*args)
         except Exception as e:
             print(e)
-            emit('serverside-error',
-                {'message': 'Sorry! A server-side error happened!'})
+            emit('serverside-error', {
+                    'message': 'Sorry! A server-side error happened!'})
 
     return doit
 
@@ -35,8 +36,8 @@ def exceptions_to_error_emit(func):
 @connection_manager.with_transaction
 def new_connection(con):
     # Return all factories in a list ordered by id
-    emit('factories', {'factories': [ f._asdict()
-                        for f in factory_model.all_factories(con)]})
+    emit('factories', {'factories': [
+         f._asdict() for f in factory_model.all_factories(con)]})
 
 
 @socketio.on('create_factory')
@@ -57,7 +58,7 @@ def create_factory(con, data):
         return
 
     new_factory = factory_model.create_factory(con, name, min_num,
-                                                    max_num, number_count)
+                                               max_num, number_count)
 
     emit('new_factory', {'factory': new_factory}, broadcast=True)
 
@@ -76,6 +77,7 @@ def delete_factory(con, data):
     factory_model.delete_factory(con, f_id)
     emit('factory_deleted', {'id': f_id}, broadcast=True)
 
+
 @socketio.on('edit_factory')
 @exceptions_to_error_emit
 @connection_manager.with_transaction
@@ -91,31 +93,36 @@ def edit_factory(con, data):
     if type(f_id) is not int:
         reply_error('Expected an int')
 
-    if complain_about_factory_params(new_name, new_low, new_high, number_count):
+    if complain_about_factory_params(new_name, new_low,
+                                     new_high, number_count):
         return
 
     updated_factory = factory_model.update_factory(con, f_id,
-                                new_name, new_low, new_high, number_count)
+                                                   new_name, new_low,
+                                                   new_high, number_count)
 
     emit('factory_updated', {'factory': updated_factory}, broadcast=True)
+
 
 ###
 # Utilities here down, plus __main__ hook.
 ###
 
+
 def reply_error(msg):
     emit('serverside-error', {'message': msg})
     print('reply_error: ' + msg)
+
 
 def complain_about_factory_params(name, min_num, max_num, number_count):
     if type(name) != str or type(min_num) != int \
             or type(max_num) != int or type(number_count) != int:
 
-        reply_error('Bad Parameter Types: %s(%s) %s(%s) %s(%s) %s(%s)' % \
-                (name, type(name), min_num, type(min_num), max_num,
-                                    type(max_num), type(number_count)))
+        reply_error('Bad Parameter Types: %s(%s) %s(%s) %s(%s) %s(%s)' %
+                    (name, type(name), min_num, type(min_num), max_num,
+                     type(max_num), type(number_count)))
 
-        return True # did indeed complain
+        return True  # did indeed complain
 
     if len(name) == 0:
         reply_error('Name empty!')
