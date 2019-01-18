@@ -18,9 +18,6 @@ db_config = 'dbname=%s user=%s host=%s' % (env['DBNAME'], env['DBUSER'], env['DB
 
 connection_manager = db.configure_flask_socketio(db_config, register_types=False)
 
-connections = 0
-
-
 def exceptions_to_error_emit(func):
     @wraps(func)
     def doit(*args):
@@ -33,26 +30,12 @@ def exceptions_to_error_emit(func):
     return doit
 
 
-@socketio.on('connect') # namespace='/chat'
+@socketio.on('connect')
 @connection_manager.with_transaction
 def new_connection(con):
-    global connections
-    connections += 1
-
-    # Broadcast new connection count.
-    emit('online_count', {'online_count' : connections}, broadcast=True)
-
     # Return all factories in a list ordered by id
     emit('factories', {'factories': [ f._asdict() for f in factory_model.all_factories(con)]})
 
-
-@socketio.on('disconnect')
-def closed_connection():
-    global connections
-    connections -= 1
-
-    # Broadcast new connection count.
-    emit('online_count', {'online_count' : connections}, broadcast=True)
 
 def reply_error(msg):
     emit('serverside-error', {'message': msg})

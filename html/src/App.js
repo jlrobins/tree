@@ -18,9 +18,6 @@ class App extends PureComponent {
       // Show create factory formlet?
       creating_factory: false,
 
-      // How many sessions connected to websocket server, inclusive.
-      online_count: 0,
-
       // websocket-level connection issue?
       connection_error: null,
 
@@ -96,12 +93,6 @@ class App extends PureComponent {
       this.setState({serverside_error: er.message})
     });
 
-    socket.on('online_count', (data) => {
-      // Someone just connected / disconnected.
-      // (connection could have been me just now)
-      this.setState({online_count: data.online_count})
-    })
-
     socket.on('factories', (data) => {
       // Announcement of initial factory list
       // (sent in response to connecting)
@@ -175,20 +166,20 @@ class App extends PureComponent {
 
 
     // Either create factory form or a button to open said form ...
-    let creation_elem;
+    let create_button = null, creation_form = null ;
     if(this.state.creating_factory)
     {
       const blank_factory = {name: '', min_value: 1, max_value: 1000, number_count: 15};
-      creation_elem = (<EditFactoryElem
+      creation_form = (<h3><EditFactoryElem
                         factory={blank_factory}
                         doCancel={() => this.setState({creating_factory: false})}
                         doSave={(f) => this.saveNewFactory(f)}
                         saveLabel="Create"
-                      />);
+                      /></h3>);
     } else {
       // show button instead.
-      creation_elem =
-        <button onClick={() => this.setState({creating_factory: true})}>Create Factory</button>;
+      create_button =
+        <button onClick={() => this.setState({creating_factory: true})}>Add</button>;
     }
 
     // Display any server-side complaint about prior form values next ...
@@ -207,9 +198,9 @@ class App extends PureComponent {
     // to call back into us to notify the central server)
     return (
       <div className="App">
-        <h1>Factory Channel: {this.state.online_count} Online</h1>
+        <h1>Root {create_button}</h1>
         {serverside_error_elem}
-        <h3>{creation_elem}</h3>
+        {creation_form}
         <FactoriesElem factories={this.state.factories}
             deletor={(id) => this.deleteFactory(id)}
             editor={(f) => this.saveEditedFactory(f)}/>
