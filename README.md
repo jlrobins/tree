@@ -17,12 +17,12 @@ http -> localhost answered by haproxy reverse proxy on :8000 to either node / fl
 
 
 Contents:
-  * `sql`: annotated database schema and user permissioning. Ran from a PG superuser account.
-  * bin: development-side scripts
-  * deploy_bin: production-side scripts
-  * etc: configuration files (haproxy configs, python virtualenv conf)
-  * flask: python code specific to this project, plus also jlr/ sub-reposistory for some of my utility code. If checking out remotely, be sure to do a recursive checkout.
-  * html: edited results from `create-react-app`.
+  * [sql](sql/): annotated database schema and user permissioning. Ran from a PG superuser account.
+  * [bin](bin/): development-side scripts
+  * [deploy_bin](deploy_bin/): production-side scripts
+  * [etc](etc/): configuration files (haproxy configs, python virtualenv conf)
+  * [flask](flask/): python code specific to this project, plus also [jlr/](../jlr/) sub-reposistory for some of my utility code. If checking out remotely, be sure to do a recursive checkout.
+  * [html](html/): edited results from `create-react-app`.
 
 Enjoy!
 
