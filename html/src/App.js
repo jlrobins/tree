@@ -331,7 +331,11 @@ class App extends PureComponent {
     let serverside_error_elem = null;
     if(this.state.serverside_error)
     {
-      serverside_error_elem = <h2>{this.state.serverside_error}</h2>;
+      serverside_error_elem = (
+        <h2 class="Error">
+          {this.state.serverside_error}
+          <button onClick={() => this.setState({serverside_error: null})}>(clear)</button>
+        </h2>);
     }
 
     return (
