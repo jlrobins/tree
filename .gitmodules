@@ -1,0 +1,3 @@
+[submodule "flask/jlr"]
+	path = flask/jlr
+	url = https://github.com/jlrobins/jlr.git
