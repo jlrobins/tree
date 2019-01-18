@@ -7,17 +7,7 @@ h1, h2, h3 {
   color: #2289EA;
 }
 
-h3 ul {
-  list-style: none;
-}
 
-h3 ul li {
-  margin-top: 1em;
-}
-
-h3 input {
-  margin-left: 1em;
-}
 
 h1 {
   padding: 10 10 20 10;
@@ -61,7 +51,7 @@ ul.factory-list li:last-child:before {
 ul.factory-list li {
   margin: 0;
   padding: 0 7px;
-  line-height: 20px;
+  line-height: 1.5em;
   color: #369;
   font-weight: bold;
   border-left:1px solid rgb(100,100,100);
@@ -69,5 +59,17 @@ ul.factory-list li {
 
 ul.factory-list li:last-child {
   border-left:none;
+}
+
+.EditFactory ul {
+  list-style: none;
+}
+
+.EditFactory li {
+  margin-top: 1em;
+}
+
+.EditFactory input {
+  margin-left: 1em;
 }
 
