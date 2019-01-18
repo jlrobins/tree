@@ -22,7 +22,10 @@ class EditFactoryElem extends PureComponent
     // Shallow clone the factory for modification purposes.
     this.state = {...props.factory}
     this.state.changed = false;
-    this.state.happy = EditFactoryElem.isHappy(this.state);;
+    this.state.happy = EditFactoryElem.isHappy(this.state);
+
+    // fwd reference to widget so we can set focus in componentDidMount()
+    this._name_input = React.createRef();;
   }
 
   static isHappy(state)
@@ -34,12 +37,15 @@ class EditFactoryElem extends PureComponent
 
   componentDidUpdate(prevProps, prevState)
   {
-
     const newHappy = EditFactoryElem.isHappy(this.state);
 
     if(prevState.happy !== newHappy)
       this.setState({happy: newHappy});
+  }
 
+  componentDidMount()
+  {
+    this._name_input.current.focus();
   }
 
   setName(value)
@@ -72,7 +78,9 @@ class EditFactoryElem extends PureComponent
     return (
       <div className="EditFactory">
         <ul>
-          <li>Name: <input type="text" value={f.name} onChange={(ev) => this.setName(ev.target.value)}/></li>
+          <li>Name: <input type="text" value={f.name}
+                  onChange={(ev) => this.setName(ev.target.value)}
+                  ref={this._name_input}/></li>
           <li>Minimum Value: <NumericInput value={f.min_value} min={1} max={1000} onChange={(val) => this.setMinValue(val)}/></li>
           <li>Maximum Value: <NumericInput value={f.max_value} min={1} max={1000} onChange={(val) => this.setMaxValue(val)}/></li>
           <li>
