@@ -13,6 +13,9 @@ html/coverage
 # production
 html/build
 
+html/src/App.test.js
+venv/
+
 # misc
 .DS_Store
 __pycache__
