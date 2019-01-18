@@ -12,11 +12,26 @@ class App extends PureComponent {
     super(props);
 
     this.state = {
+      // Do I have a thought-to-be-happy websocket connection?
       connected: false,
+
+      // Show create factory formlet?
       creating_factory: false,
+
+      // How many sessions connected to websocket server, inclusive.
       online_count: 0,
+
+      // websocket-level connection issue?
       connection_error: null,
+
+      // factoryy create/edit error message?
       serverside_error: null,
+
+      // List of current factories.
+      // Each factory as in:
+      //    {name: 'Foo', min_value: 12, max_value: 44,
+      //            count_numbers: 3, numbers: [24, 33, 17]}
+
       factories: []
     }
 
