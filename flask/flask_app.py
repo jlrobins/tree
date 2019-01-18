@@ -1,9 +1,9 @@
 from flask import Flask, g, jsonify, request
-from flask_socketio import SocketIO, send, emit
+from flask_socketio import SocketIO, emit
 from os import environ as env
 from functools import wraps
 
-import jlr.db as db
+from jlr.db import configure_flask_socketio
 import factory_model
 
 
@@ -15,7 +15,7 @@ socketio = SocketIO(app)
 db_config = 'dbname=%s user=%s host=%s' % (
                     env['DBNAME'], env['DBUSER'], env['DBHOST'])
 
-connection_manager = db.configure_flask_socketio(db_config, register_types=False)
+connection_manager = configure_flask_socketio(db_config, register_types=False)
 
 # decorator to catch exceptions and report back to client.
 def exceptions_to_error_emit(func):
