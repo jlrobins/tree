@@ -3,6 +3,22 @@
   padding-left: 10px ;
 }
 
+h1, h2, h3 {
+  color: #2289EA;
+}
+
+h3 ul {
+  list-style: none;
+}
+
+h3 ul li {
+  margin-top: 1em;
+}
+
+h3 input {
+  margin-left: 1em;
+}
+
 h1 {
   padding: 10 10 20 10;
   border: 0;
