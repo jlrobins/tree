@@ -33,14 +33,19 @@ class App extends PureComponent {
   */
   setupWebSocket() {
     const socket = io.connect({transports: ['websocket']});
-
     this.socket = socket;
 
-
     /*
-      Websocket lifecycle handlers first
+      Websocket lifecycle handlers first ...
     */
+
+    socket.on('connect', () => {
+      this.setState({connected: true});
+    });
+
     socket.on('reconnect_attempt', () => {
+      // Perhaps directly connecting via websocket failed.
+      // Fallback to trying polling first.
       socket.io.opts.transports = ['polling', 'websocket'];
       this.setState({connected: false})
     });
@@ -53,6 +58,7 @@ class App extends PureComponent {
       this.setState({connection_error: er})
     });
 
+    /*
     socket.on('ping', () => {
       console.log('pinging ... ');
     });
@@ -60,12 +66,9 @@ class App extends PureComponent {
     socket.on('pong', (latency) => {
       console.log('pong latency: ' + latency);
     });
+    */
 
-    socket.on('connect', () => {
-      this.setState({connected: true});
-    });
-
-      socket.on('disconnect', () => {
+    socket.on('disconnect', () => {
         this.setState({connected: false});
     });
 
@@ -73,34 +76,39 @@ class App extends PureComponent {
       Business-use messages here down
     */
     socket.on('serverside-error', (er) => {
+      // Something unhappy on the websocket server side.
+      // (possibly server-side unhappy with a value we submitted)
       this.setState({serverside_error: er.message})
     });
 
     socket.on('online_count', (data) => {
+      // Someone just connected / disconnected.
+      // (connection could have been me just now)
       this.setState({online_count: data.online_count})
     })
 
     socket.on('factories', (data) => {
       // Announcement of initial factory list
+      // (sent in response to connecting)
       this.setState({factories: data.factories})
     });
 
     socket.on('new_factory', (data) => {
-      // broadcasted newly created factory, even if came from me
+      // Someone, possibly me, created a factory.
       const factories = [...this.state.factories];
       factories.push(data.factory);
       this.setState({factories: factories});
     })
 
     socket.on('factory_deleted', (data) => {
-      // someone, including me, deleted a factory
+      // Someone, possibly me, deleted a factory.
       const dead_id = data.id;
       const remaining_factories = this.state.factories.filter(f => f.id !== dead_id);
       this.setState({factories: remaining_factories});
     })
 
     socket.on('factory_updated', (data) => {
-      // someone, including me, updated a factory
+      // Someone, possibly me, updated a factory.
       const factories = [...this.state.factories]; // shallow copy
       const updated_factory = data.factory;
       const idx = factories.findIndex(f => f.id === updated_factory.id);
@@ -114,22 +122,25 @@ class App extends PureComponent {
   }
 
   /* UI executed methods: deleteFactory(), saveNewFactory(), saveEditedFactory()
-      message the socket and possible adjust state immediately
+      message the socket and possible adjust state immediately.
   */
   deleteFactory(f_id)
   {
     this.socket.emit('delete_factory', {id: f_id});
+    // server will reply back with a 'factory_deleted' event, see above.
   }
 
   saveNewFactory(f)
   {
     this.socket.emit('create_factory', f);
     this.setState({creating_factory: false});
+    // server will reply back with a 'new_factory' event, see above.
   }
 
   saveEditedFactory(f)
   {
     this.socket.emit('edit_factory', f);
+    // server will reply back with a 'factory_updated' event, see above.
   }
 
   /*
