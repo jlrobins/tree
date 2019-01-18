@@ -21,7 +21,7 @@ Contents:
   * [bin](bin/): development-side scripts
   * [deploy_bin](deploy_bin/): production-side scripts
   * [etc](etc/): configuration files (haproxy configs, python virtualenv conf)
-  * [flask](flask/): python code specific to this project, plus also [jlr/](../jlr/) sub-reposistory for some of my utility code. If checking out remotely, be sure to do a recursive checkout.
+  * [flask](flask/): python code specific to this project, plus also [jlr/](https://github.com/jlrobins/jlr) sub-reposistory for some of my utility code. If checking out remotely, be sure to do a recursive checkout.
   * [html](html/): edited results from `create-react-app`.
 
 Enjoy!
