@@ -154,10 +154,12 @@ class App extends PureComponent {
 
     if (! this.state.connected)
     {
-      return <h1>Connecting {con_error_msg}...</h1>
+      // Short circuit if not connected yet.
+      return <h1>Connecting {con_error_msg}...</h1>;
     }
 
 
+    // Either create factory form or a button to open said form ...
     let creation_elem;
     if(this.state.creating_factory)
     {
@@ -174,6 +176,7 @@ class App extends PureComponent {
         <button onClick={() => this.setState({creating_factory: true})}>Create Factory</button>;
     }
 
+    // Display any server-side complaint about prior form values next ...
     let serverside_error_elem = null;
     if(this.state.serverside_error)
     {
@@ -184,6 +187,9 @@ class App extends PureComponent {
         </h2>);
     }
 
+    // Overall structure, ending with the list of current factories
+    // (which itself offers individual-factory-edit capability but needs
+    // to call back into us to notify the central server)
     return (
       <div className="App">
         <h1>Factory Channel: {this.state.online_count} Online</h1>
