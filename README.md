@@ -1,4 +1,4 @@
-# Passport Inc.'s 'tree' challenge
+# 'tree' react / flask example
 
 ## James Robinson
 
