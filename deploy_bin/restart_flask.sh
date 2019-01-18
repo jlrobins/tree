@@ -19,7 +19,7 @@ cd deploy/flask
 export FLASK_APP=flask_app
 
 export DBNAME='tree_db'
-export DBUSER='treemaster'
+export DBUSER='webspace'
 export DBHOST='treedb.clzcbbduzin7.us-east-2.rds.amazonaws.com'
 
 flask run --host=0.0.0.0 >& /tmp/flask_log < /dev/null &

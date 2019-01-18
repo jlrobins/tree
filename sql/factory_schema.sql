@@ -1,3 +1,5 @@
+\set ON_ERROR_STOP
+
 begin;
 
 	create table factory
@@ -45,17 +47,23 @@ begin;
 
 	);
 
+	/* A bigger project would grow have some metadata table(s)
+	*  describing schemas / individual tables and who should have
+	*  whatever least privileges. But we've got just one table and one
+	*  non-superuser role here, so ...
+	*/
 
-	insert into factory (name, min_value, max_value, numbers)
-		values ('London', 1, 100, '{1,99,3,4,4}');
+	-- Start by removing the permissive permissions
+	-- on schema public.
+	REVOKE ALL ON schema public FROM public;
 
-	insert into factory (name, min_value, max_value, numbers)
-		values ('Eagle', 1, 1000, '{94, 546, 345, 756, 992, 45, 1, 765}');
+	create user webspace;
 
+	grant connect on database tree_db to webspace;
+	grant usage on schema public to webspace; -- allow reading this schema
+	grant select, insert, update, delete on factory to webspace; -- manip this table
+	grant select, update  on factory_id_seq to webspace; -- and sequence.
 
-	select to_json(f.*)::text
-		from factory f
-		order by id;
-
+	-- "alter role webspace password ..." set out-of-source-control.
 
 commit;
