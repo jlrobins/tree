@@ -129,6 +129,10 @@ def complain_about_factory_params(name, min_num, max_num, number_count):
         reply_error('Name empty!')
         return True
 
+    if name.strip() != name:
+        reply_error('Name should already be stripped from leading/trailing whitespace.')
+        return True
+
     if len(name) >= 256:
         reply_error('Name too long (max 256 characters)')
         return True

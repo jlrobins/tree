@@ -96,19 +96,17 @@ def update_factory(con, factory_id: int, new_name: str,
     if old_factory.name != new_name:
         update_columns_values.append(('name', new_name))
 
-    if not update_columns_values:
-        raise Exception('Nothing to change!')
+    if update_columns_values:
+        update_count = sql.update(con,
+                                  'factory',  # table name
+                                  [('id = %s', factory_id)],  # where clause parts
+                                  # pairs of column to new values
+                                  update_columns_values
+                                  )
 
-    update_count = sql.update(con,
-                              'factory',  # table name
-                              [('id = %s', factory_id)],  # where clause parts
-                              # pairs of column to new values
-                              update_columns_values
-                              )
-
-    if not update_count:
-        raise Exception('Update did not find row to update.'
-                        ' Deleted out from underneath?')
+        if not update_count:
+            raise Exception('Update did not find row to update.'
+                            ' Deleted out from underneath?')
 
     return return_values
 

@@ -188,7 +188,7 @@ class App extends PureComponent {
     {
       serverside_error_elem = (
         <h2 className="Error">
-          {this.state.serverside_error}
+          Sorry! {this.state.serverside_error}
           <button onClick={() => this.setState({serverside_error: null})}>(clear)</button>
         </h2>);
     }

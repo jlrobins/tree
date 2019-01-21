@@ -152,6 +152,14 @@ class EditFactoryElem extends PureComponent
     this.setState({number_count: value, changed: true})
   }
 
+  prepAndDoSave()
+  {
+    const f = this.state;
+    // server-side does not want to see leading/trailing spaces ...
+    f.name = f.name.trim();
+    this.props.doSave(f);
+  }
+
   render() {
     const f = this.state;
 
@@ -184,7 +192,7 @@ class EditFactoryElem extends PureComponent
                   max={1000} onChange={(val) => this.setMaxValue(val)}/></li>
 
           <li>
-              <button onClick={() => this.props.doSave(f)}
+              <button onClick={() => this.prepAndDoSave()}
                     disabled={save_disabled}>{this.props.saveLabel}</button>
 
               {deleteElement}
